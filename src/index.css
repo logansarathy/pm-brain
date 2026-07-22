@@ -1,0 +1,7 @@
+/* Minimal reset for now — replaced with your real design tokens in Phase 2. */
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+}
