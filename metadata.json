@@ -1,0 +1,6 @@
+{
+  "name": "Product Management Journey",
+  "description": "A comprehensive Product Management OS and learning journey application",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
