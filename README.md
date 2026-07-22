@@ -1,6 +1,6 @@
 # React + TypeScript + Vite
 
-This template provides knvjdbhjsvhjda minimal setup to get React working in Vite with HMR and some Oxlint rules.
+This template provides  minimal setup to get React working in Vite with HMR and some Oxlint rules.
 
 Currently, two official plugins are available:
 
