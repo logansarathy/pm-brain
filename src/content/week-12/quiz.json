@@ -1,0 +1,16 @@
+{
+  "title": "Week 12 Checkpoint Quiz",
+  "questions": [
+    {
+      "id": "q1",
+      "text": "What is the primary goal of Week 12?",
+      "options": [
+        "Understand core domain principles",
+        "Skip research and build immediately",
+        "Ignore user feedback",
+        "Rely solely on intuition"
+      ],
+      "answer": 0
+    }
+  ]
+}

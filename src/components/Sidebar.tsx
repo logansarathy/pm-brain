@@ -30,7 +30,9 @@ export const Sidebar: React.FC = () => {
   const navGroups = [
     {
       group: null,
-      items: [{ route: 'home', label: 'Home', icon: 'dashboard', sub: false, status: undefined }],
+      items: [
+        { route: 'home', label: 'Home Workspace', icon: 'dashboard', sub: false, status: undefined },
+      ],
     },
     {
       group: 'Learning Journey',
@@ -43,6 +45,7 @@ export const Sidebar: React.FC = () => {
     {
       group: 'PM Lab',
       items: [
+        { route: 'pmlab', label: 'PM Lab Timeline', icon: 'tracker', sub: false, status: undefined },
         { route: 'cleano', label: 'CleanO', icon: 'cleano', sub: false, status: undefined },
         { route: 'gof', label: 'GOF', icon: 'gof', sub: false, status: undefined },
         { route: 'improvement', label: 'Experiments', icon: 'bolt', sub: false, status: undefined },
@@ -53,6 +56,7 @@ export const Sidebar: React.FC = () => {
     {
       group: 'Knowledge Hub',
       items: [
+        { route: 'knowledge', label: 'Knowledge Hub', icon: 'knowledge', sub: false, status: undefined },
         { route: 'notes', label: 'Notes', icon: 'notes', sub: false, status: undefined },
         { route: 'frameworks', label: 'Frameworks', icon: 'knowledge', sub: false, status: undefined },
         { route: 'resources', label: 'Resources', icon: 'library', sub: false, status: undefined },
@@ -83,7 +87,7 @@ export const Sidebar: React.FC = () => {
     {
       group: 'System',
       items: [
-        { route: 'dashboard', label: 'Analytics', icon: 'tracker', sub: false, status: undefined },
+        { route: 'profile', label: 'My Account', icon: 'dashboard', sub: false, status: undefined },
         { route: 'search', label: 'Search', icon: 'search', sub: false, status: undefined },
         { route: 'settings', label: 'Settings', icon: 'settings', sub: false, status: undefined },
       ],
@@ -93,44 +97,78 @@ export const Sidebar: React.FC = () => {
   return (
     <aside id="sidebar" className={`${collapsed ? 'collapsed' : ''} ${isSidebarMobileOpen ? 'mobile-open' : ''}`}>
       <div className="sidebar-brand">
-        <div className="brand-mark">LS</div>
-        <div className="brand-text">
-          Logansarathy
-          <span>Building Products. Building Myself.</span>
+        <div
+          style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}
+          onClick={() => {
+            navigate('home');
+            closeSidebarMobile();
+          }}
+        >
+          <div
+            style={{
+              width: '32px',
+              height: '32px',
+              borderRadius: '8px',
+              background: '#FF7A00',
+              color: '#fff',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontWeight: 800,
+              fontSize: '14px',
+            }}
+          >
+            PM
+          </div>
+          {!collapsed && (
+            <div>
+              <div style={{ fontWeight: 800, fontSize: '15px', color: 'var(--text-main)', lineHeight: '1.2' }}>
+                PM OS
+              </div>
+              <div style={{ fontSize: '10px', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                Operating System
+              </div>
+            </div>
+          )}
         </div>
+        <button
+          className="sidebar-collapse-toggle desktop-only"
+          onClick={toggleCollapse}
+          title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+        >
+          {collapsed ? '→' : '←'}
+        </button>
       </div>
 
-      <nav className="sidebar-scroll" id="sidebar-nav">
-        {navGroups.map((group, gIdx) => (
-          <div className="nav-group" key={gIdx}>
-            {group.group && <div className="nav-group-label">{group.group}</div>}
-            {group.items.map((item, iIdx) => {
-              const isActive = route === item.route;
+      <nav className="sidebar-nav">
+        {navGroups.map((g, idx) => (
+          <div className="nav-group" key={idx}>
+            {g.group && !collapsed && <div className="nav-group-title">{g.group}</div>}
+            {g.items.map((item) => {
+              const isActive = route === item.route || (item.route.startsWith('week/') && route === item.route);
               return (
                 <div
-                  key={iIdx}
-                  className={`nav-item ${item.sub ? 'nav-sub' : ''} ${item.status ? 'status-' + item.status : ''} ${
-                    isActive ? 'active' : ''
-                  }`}
+                  key={item.route}
+                  className={`nav-item ${isActive ? 'active' : ''} ${item.sub ? 'sub' : ''}`}
                   onClick={() => {
                     navigate(item.route);
                     closeSidebarMobile();
                   }}
+                  title={item.label}
                 >
-                  {item.sub ? <span className="nav-dot"></span> : getIcon(item.icon)}
-                  <span>{item.label}</span>
+                  <span className="nav-icon">{getIcon(item.icon)}</span>
+                  {!collapsed && <span className="nav-label">{item.label}</span>}
+                  {!collapsed && item.status && (
+                    <span className={`nav-badge status-${item.status}`}>
+                      {item.status === 'complete' ? '✓' : item.status === 'active' ? '•' : ''}
+                    </span>
+                  )}
                 </div>
               );
             })}
           </div>
         ))}
       </nav>
-
-      <div className="sidebar-footer">
-        <button className="collapse-btn" id="collapse-btn" onClick={toggleCollapse}>
-          Collapse
-        </button>
-      </div>
     </aside>
   );
 };

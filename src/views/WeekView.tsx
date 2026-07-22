@@ -12,7 +12,6 @@ import {
 } from '../components/CommonUI';
 import {
   BLOCK_TYPES,
-  defaultLessons,
   ensureLessonShape,
   isLessonLocked,
   lessonIsComplete,
@@ -22,7 +21,7 @@ import {
   weekProgressPct,
   weekRequiredSections,
 } from '../lib/data';
-import { ContentBlock, Lesson, Week } from '../types';
+import { ContentBlock } from '../types';
 import {
   ClockIcon,
   InterviewIcon,
@@ -30,6 +29,8 @@ import {
   RoadmapIcon,
   TrashIcon,
 } from '../components/Icons';
+import { getWeekContent, WeekContent } from '../services/contentLoader';
+import { MarkdownView } from '../components/MarkdownView';
 
 const WEEK_TABS: Array<[string, string]> = [
   ['overview', 'Overview'],
@@ -60,6 +61,7 @@ export const WeekView: React.FC<{ weekId: number }> = ({ weekId }) => {
   const [activeTab, setActiveTab] = useState<string>('lessons');
 
   const w = state.weeks.find((x) => x.id === weekId);
+  const loadedContent: WeekContent = getWeekContent(weekId);
 
   // Auto-completion check
   useEffect(() => {
@@ -312,7 +314,18 @@ export const WeekView: React.FC<{ weekId: number }> = ({ weekId }) => {
   };
 
   const renderLessons = () => {
-    const lessons = w.lessons && w.lessons.length ? w.lessons : defaultLessons();
+    // Combine state lessons with static markdown content lessons
+    const contentLessons = loadedContent.lessons;
+    const lessons = w.lessons && w.lessons.length ? w.lessons : contentLessons.map((cl, i) => ({
+      id: cl.id,
+      title: cl.title,
+      objective: '',
+      estimatedTime: '20 min',
+      contentBlocks: [],
+      notes: '',
+      keyTakeaways: '',
+      completion: { done: false },
+    }));
 
     return (
       <>
@@ -329,6 +342,7 @@ export const WeekView: React.FC<{ weekId: number }> = ({ weekId }) => {
           const completed = lessonIsComplete(lsnShape);
           const statusKey = locked ? 'locked' : completed ? 'completed' : 'not-started';
           const meta = LESSON_STATUS_META[statusKey];
+          const staticMd = contentLessons[idx]?.markdown || '';
 
           return (
             <div className={`lesson-card status-${statusKey}`} key={lsnShape.id || idx}>
@@ -336,7 +350,7 @@ export const WeekView: React.FC<{ weekId: number }> = ({ weekId }) => {
                 <div className="lesson-badge">Lesson {idx + 1}</div>
                 <input
                   className="lesson-title-input"
-                  value={lsnShape.title}
+                  value={lsnShape.title || contentLessons[idx]?.title || `Lesson ${idx + 1}`}
                   placeholder="Lesson title"
                   disabled={locked}
                   onChange={(e) => updatePath(`${base}.lessons.${idx}.title`, e.target.value)}
@@ -349,88 +363,95 @@ export const WeekView: React.FC<{ weekId: number }> = ({ weekId }) => {
                 </div>
               </div>
 
-              {locked ? (
-                <div className="lesson-body-locked">
-                  <ClockIcon /> Complete Lesson {idx} first to unlock this lesson.
+              {locked && (
+                <div className="p-3 my-3 rounded-xl bg-[#FFFDF9] border border-[#FF7A00]/30 text-[#1E1E1E] text-xs font-medium flex items-center justify-between shadow-2xs">
+                  <div className="flex items-center gap-2.5">
+                    <span className="p-1 rounded-lg bg-[#FF7A00]/10 text-[#FF7A00] font-bold">🔒</span>
+                    <div>
+                      <span className="font-semibold text-[#FF7A00] block">Read-Only Preview Mode</span>
+                      <span className="text-[#6B7280]">Complete Lesson {idx} to unlock interactive tasks and notes.</span>
+                    </div>
+                  </div>
+                  <span className="px-2.5 py-1 bg-[#ECECEC]/60 rounded-full text-[11px] text-[#6B7280] font-semibold">Locked</span>
                 </div>
-              ) : (
-                <>
-                  <div className="lesson-meta-row">
-                    <InputField
-                      path={`${base}.lessons.${idx}.objective`}
-                      label="Objective"
-                      placeholder="What will the student be able to do after this lesson?"
-                    />
-                    <InputField
-                      path={`${base}.lessons.${idx}.estimatedTime`}
-                      label="Estimated Time"
-                      placeholder="e.g. 20 minutes"
-                    />
-                  </div>
-
-                  <div className="content-blocks">
-                    {(!lsnShape.contentBlocks || lsnShape.contentBlocks.length === 0) && (
-                      <div
-                        style={{ color: 'var(--text-faint)', fontSize: '12.5px', padding: '6px 4px' }}
-                        className="creator-only"
-                      >
-                        No content blocks yet — add one below.
-                      </div>
-                    )}
-                    {(lsnShape.contentBlocks || []).map((blk, blockIdx) =>
-                      renderContentBlock(blk, idx, blockIdx)
-                    )}
-                  </div>
-
-                  <div className="block-add-row creator-only">
-                    {BLOCK_TYPES.map(([type, label, icon]) => (
-                      <button
-                        key={type}
-                        className="btn btn-ghost btn-sm block-add-btn"
-                        onClick={() => handleAddBlock(idx, type)}
-                      >
-                        {icon} {label}
-                      </button>
-                    ))}
-                  </div>
-
-                  <TextareaField
-                    path={`${base}.lessons.${idx}.notes`}
-                    label="📝 Notes"
-                    placeholder="Your notes for this lesson…"
-                    rows={3}
-                    isStudent
-                  />
-                  <TextareaField
-                    path={`${base}.lessons.${idx}.keyTakeaways`}
-                    label="🔑 Key Takeaways"
-                    placeholder="What are the key things to remember from this lesson?"
-                    rows={3}
-                    isStudent
-                  />
-
-                  <label
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '8px',
-                      margin: '4px 0 0 0',
-                      fontSize: '13px',
-                      color: 'var(--text-dim)',
-                    }}
-                  >
-                    <input
-                      type="checkbox"
-                      className="list-check student-input"
-                      checked={completed}
-                      onChange={(e) => handleLessonToggle(idx, e.target.checked)}
-                    />{' '}
-                    Mark this lesson complete
-                  </label>
-                </>
               )}
 
-              <div className="lesson-card-foot">
+              <div className="lesson-meta-row">
+                <InputField
+                  path={`${base}.lessons.${idx}.objective`}
+                  label="Objective"
+                  placeholder="What will the student be able to do after this lesson?"
+                />
+                <InputField
+                  path={`${base}.lessons.${idx}.estimatedTime`}
+                  label="Estimated Time"
+                  placeholder="e.g. 20 minutes"
+                />
+              </div>
+
+              {/* Render Static Markdown Content from src/content/ if available */}
+              {staticMd && (
+                <div className="card my-3 bg-[var(--card-bg)] border border-[var(--border-color)] p-4 rounded-md">
+                  <MarkdownView content={staticMd} />
+                </div>
+              )}
+
+              <div className="content-blocks">
+                {(lsnShape.contentBlocks || []).map((blk, blockIdx) =>
+                  renderContentBlock(blk, idx, blockIdx)
+                )}
+              </div>
+
+              <div className="block-add-row creator-only">
+                {BLOCK_TYPES.map(([type, label, icon]) => (
+                  <button
+                    key={type}
+                    className="btn btn-ghost btn-sm block-add-btn"
+                    onClick={() => handleAddBlock(idx, type)}
+                  >
+                    {icon} {label}
+                  </button>
+                ))}
+              </div>
+
+              <TextareaField
+                path={`${base}.lessons.${idx}.notes`}
+                label="📝 Notes"
+                placeholder="Your notes for this lesson…"
+                rows={3}
+                isStudent
+              />
+              <TextareaField
+                path={`${base}.lessons.${idx}.keyTakeaways`}
+                label="🔑 Key Takeaways"
+                placeholder="What are the key things to remember from this lesson?"
+                rows={3}
+                isStudent
+              />
+
+              <label
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  margin: '4px 0 0 0',
+                  fontSize: '13px',
+                  color: 'var(--text-dim)',
+                  opacity: locked ? 0.6 : 1,
+                }}
+                title={locked ? `Complete Lesson ${idx} first to mark this complete` : ''}
+              >
+                <input
+                  type="checkbox"
+                  className="list-check student-input"
+                  checked={completed}
+                  disabled={locked}
+                  onChange={(e) => handleLessonToggle(idx, e.target.checked)}
+                />{' '}
+                Mark this lesson complete {locked ? '(Locked)' : ''}
+              </label>
+
+              <div className="lesson-card-foot creator-only">
                 <button
                   className="btn btn-ghost btn-sm"
                   onClick={() => handleRemoveLesson(idx)}
@@ -442,7 +463,7 @@ export const WeekView: React.FC<{ weekId: number }> = ({ weekId }) => {
           );
         })}
 
-        <button className="btn" onClick={handleAddLesson}>
+        <button className="btn creator-only" onClick={handleAddLesson}>
           <PlusIcon /> Add Lesson
         </button>
       </>
@@ -455,12 +476,24 @@ export const WeekView: React.FC<{ weekId: number }> = ({ weekId }) => {
         return renderLessons();
       case 'overview':
         return (
-          <div className="card">
-            <TextareaField path={`${base}.overview.goal`} label="Goal" placeholder="What is this week meant to achieve?" />
-            <TextareaField path={`${base}.overview.why`} label="Why This Matters" />
-            <TextareaField path={`${base}.overview.outcome`} label="Expected Outcome (Learning Objectives)" />
-            <InputField path={`${base}.overview.skills`} label="Skills Learned" placeholder="e.g. User Research, RICE Prioritization" />
-            <InputField path={`${base}.overview.timeRequired`} label="Time Required" placeholder="e.g. 6 hours" />
+          <div className="card space-y-4">
+            {loadedContent.overview && (
+              <div className="p-4 bg-[var(--card-bg)] rounded border border-[var(--border-color)]">
+                <MarkdownView content={loadedContent.overview} />
+              </div>
+            )}
+            {loadedContent.objectives && (
+              <div className="p-4 bg-[var(--card-bg)] rounded border border-[var(--border-color)]">
+                <MarkdownView content={loadedContent.objectives} />
+              </div>
+            )}
+            <div className="creator-only space-y-3 pt-3 border-t border-[var(--border-color)]">
+              <TextareaField path={`${base}.overview.goal`} label="Goal Override" placeholder="What is this week meant to achieve?" />
+              <TextareaField path={`${base}.overview.why`} label="Why This Matters Override" />
+              <TextareaField path={`${base}.overview.outcome`} label="Expected Outcome Override" />
+              <InputField path={`${base}.overview.skills`} label="Skills Learned" placeholder="e.g. User Research, RICE Prioritization" />
+              <InputField path={`${base}.overview.timeRequired`} label="Time Required" placeholder="e.g. 6 hours" />
+            </div>
           </div>
         );
       case 'theory':
@@ -485,7 +518,12 @@ export const WeekView: React.FC<{ weekId: number }> = ({ weekId }) => {
         );
       case 'frameworks':
         return (
-          <div className="card">
+          <div className="card space-y-4">
+            {loadedContent.frameworks && (
+              <div className="p-4 bg-[var(--card-bg)] rounded border border-[var(--border-color)]">
+                <MarkdownView content={loadedContent.frameworks} />
+              </div>
+            )}
             <div className="section-title">Frameworks Covered This Week</div>
             <ListEditor path={`${base}.learn.frameworks`} placeholder="Framework name" />
           </div>
@@ -493,12 +531,22 @@ export const WeekView: React.FC<{ weekId: number }> = ({ weekId }) => {
       case 'summary':
         return (
           <div className="card">
+            {loadedContent.resources && (
+              <div className="p-4 mb-4 bg-[var(--card-bg)] rounded border border-[var(--border-color)]">
+                <MarkdownView content={loadedContent.resources} />
+              </div>
+            )}
             <TextareaField path={`${base}.learn.keyTakeaways`} label="Key Takeaways" />
           </div>
         );
       case 'practice':
         return (
           <>
+            {loadedContent.practice && (
+              <div className="card mb-4 p-4">
+                <MarkdownView content={loadedContent.practice} />
+              </div>
+            )}
             <div className="card" style={{ marginBottom: '14px' }}>
               <div className="section-title">Product Sense</div>
               <ListEditor path={`${base}.practice.exercises`} placeholder="Add a product sense exercise" />
@@ -536,9 +584,14 @@ export const WeekView: React.FC<{ weekId: number }> = ({ weekId }) => {
       case 'pmlab':
         return (
           <>
-            <div className="card" style={{ marginBottom: '14px' }}>
+            {loadedContent.pmlab && (
+              <div className="card mb-4 p-4">
+                <MarkdownView content={loadedContent.pmlab} />
+              </div>
+            )}
+            <div className="card creator-only" style={{ marginBottom: '14px' }}>
               <div className="section-title">
-                Assignment Brief <span className="badge badge-locked creator-only">Creator defines this</span>
+                Assignment Brief <span className="badge badge-locked">Creator defines this</span>
               </div>
               <TextareaField path={`${base}.pmLab.goal`} label="Goal" placeholder="What is this lab meant to achieve?" />
               <TextareaField path={`${base}.pmLab.task`} label="Task" placeholder="What exactly should the student do?" />
@@ -618,7 +671,12 @@ export const WeekView: React.FC<{ weekId: number }> = ({ weekId }) => {
         );
       case 'deliverable':
         return (
-          <div className="card">
+          <div className="card space-y-4">
+            {loadedContent.assignment && (
+              <div className="p-4 bg-[var(--card-bg)] rounded border border-[var(--border-color)]">
+                <MarkdownView content={loadedContent.assignment} />
+              </div>
+            )}
             <InputField path={`${base}.deliverable.type`} label="Type" placeholder="e.g. PRD, Persona, Roadmap, Wireframe" />
             <InputField path={`${base}.deliverable.title`} label="Title" />
             <TextareaField path={`${base}.deliverable.description`} label="Your Submission" placeholder="Write or describe your submission here…" isStudent />
@@ -656,7 +714,12 @@ export const WeekView: React.FC<{ weekId: number }> = ({ weekId }) => {
         );
       case 'aiMentor':
         return (
-          <div className="card">
+          <div className="card space-y-4">
+            {loadedContent.interview && (
+              <div className="p-4 bg-[var(--card-bg)] rounded border border-[var(--border-color)]">
+                <MarkdownView content={loadedContent.interview} />
+              </div>
+            )}
             <div className="section-title">Interview Questions For This Week</div>
             <ListEditor path={`${base}.aiMentor.log`} placeholder="Add an interview question to prep" />
             <p style={{ fontSize: '12px', color: 'var(--text-faint)', marginTop: '10px' }}>
@@ -672,8 +735,28 @@ export const WeekView: React.FC<{ weekId: number }> = ({ weekId }) => {
       case 'quiz':
         return (
           <>
-            <div className="card" style={{ marginBottom: '14px' }}>
-              <div className="section-title">Questions</div>
+            {loadedContent.quiz && loadedContent.quiz.questions.length > 0 && (
+              <div className="card mb-4 p-4">
+                <div className="section-title mb-3">{loadedContent.quiz.title}</div>
+                {loadedContent.quiz.questions.map((q, qIdx) => (
+                  <div key={q.id || qIdx} className="mb-4 pb-3 border-b border-[var(--border-color)] last:border-b-0">
+                    <div className="font-medium text-sm mb-2">{qIdx + 1}. {q.text}</div>
+                    <div className="space-y-1 pl-2">
+                      {q.options.map((opt, optIdx) => (
+                        <div key={optIdx} className="text-sm text-[var(--text-dim)] flex items-center gap-2">
+                          <span className="w-4 h-4 rounded-full border border-[var(--border-color)] inline-flex items-center justify-center text-xs">
+                            {String.fromCharCode(65 + optIdx)}
+                          </span>
+                          {opt}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+            <div className="card creator-only" style={{ marginBottom: '14px' }}>
+              <div className="section-title">Custom Questions Override</div>
               <ListEditor path={`${base}.quiz.questions`} placeholder="Add a quiz question" />
             </div>
             <div className="card" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -695,7 +778,12 @@ export const WeekView: React.FC<{ weekId: number }> = ({ weekId }) => {
         );
       case 'portfolioArtifact':
         return (
-          <div className="card">
+          <div className="card space-y-4">
+            {loadedContent.portfolio && (
+              <div className="p-4 bg-[var(--card-bg)] rounded border border-[var(--border-color)]">
+                <MarkdownView content={loadedContent.portfolio} />
+              </div>
+            )}
             <TextareaField path={`${base}.portfolioArtifact.description`} label="Description" isStudent />
             <InputField path={`${base}.portfolioArtifact.downloadLink`} label="Download Link" isStudent />
             <TextareaField path={`${base}.portfolioArtifact.linkedinDraft`} label="LinkedIn Post Draft" isStudent />
@@ -703,7 +791,12 @@ export const WeekView: React.FC<{ weekId: number }> = ({ weekId }) => {
         );
       case 'linkedinTask':
         return (
-          <div className="card">
+          <div className="card space-y-4">
+            {loadedContent.linkedin && (
+              <div className="p-4 bg-[var(--card-bg)] rounded border border-[var(--border-color)]">
+                <MarkdownView content={loadedContent.linkedin} />
+              </div>
+            )}
             <TextareaField path={`${base}.linkedinTask.idea`} label="Idea" placeholder="What will this post be about?" isStudent />
             <TextareaField path={`${base}.linkedinTask.draft`} label="Draft" isStudent />
             <InputField path={`${base}.linkedinTask.link`} label="Published Link" placeholder="https://…" isStudent />
@@ -740,7 +833,12 @@ export const WeekView: React.FC<{ weekId: number }> = ({ weekId }) => {
         );
       case 'reflection':
         return (
-          <div className="card">
+          <div className="card space-y-4">
+            {loadedContent.reflection && (
+              <div className="p-4 bg-[var(--card-bg)] rounded border border-[var(--border-color)]">
+                <MarkdownView content={loadedContent.reflection} />
+              </div>
+            )}
             <TextareaField path={`${base}.reflection.learned`} label="What did I learn?" isStudent />
             <TextareaField path={`${base}.reflection.mistake`} label="Biggest mistake" isStudent />
             <TextareaField path={`${base}.reflection.newIdea`} label="New idea" isStudent />
@@ -806,6 +904,21 @@ export const WeekView: React.FC<{ weekId: number }> = ({ weekId }) => {
         title={w.title}
         sub={`${w.status} · ${pct}% complete`}
       />
+
+      {w.status === 'locked' && (
+        <div className="p-4 mb-5 rounded-2xl bg-[#FFFDF9] border border-[#FF7A00]/30 text-[#1E1E1E] text-xs font-medium flex items-center justify-between shadow-2xs">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-xl bg-[#FF7A00]/10 text-[#FF7A00] font-bold text-base">
+              🔒
+            </div>
+            <div>
+              <span className="font-bold text-[#FF7A00] text-sm block">Week Preview Mode</span>
+              <span className="text-[#6B7280]">Complete Week {Math.max(0, w.id - 1)} to unlock assignment submissions for Week {w.id}. All curriculum content and objectives are visible in preview mode below.</span>
+            </div>
+          </div>
+          <span className="px-3 py-1 bg-[#ECECEC] rounded-full text-xs text-[#6B7280] font-semibold shrink-0">Locked</span>
+        </div>
+      )}
 
       <div style={{ display: 'flex', gap: '8px', marginBottom: '16px', flexWrap: 'wrap' }}>
         <button className="btn btn-sm" onClick={() => navigate('roadmap')}>
