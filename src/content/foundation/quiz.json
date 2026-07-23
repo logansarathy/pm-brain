@@ -1,16 +1,112 @@
-{
-  "title": "Foundation · Orientation Checkpoint Quiz",
-  "questions": [
-    {
-      "id": "q1",
-      "text": "What is the primary goal of Foundation · Orientation?",
-      "options": [
-        "Understand core domain principles",
-        "Skip research and build immediately",
-        "Ignore user feedback",
-        "Rely solely on intuition"
-      ],
-      "answer": 0
-    }
-  ]
-}
+[
+  {
+    "question": "What is the primary role of a Product Manager?",
+    "options": [
+      "Managing project timelines and tasks.",
+      "Overseeing quality assurance testing.",
+      "Defining product vision and strategy.",
+      "Writing code for the product."
+    ],
+    "answer": 2,
+    "explanation": "Product Managers set the product vision and strategy, aligning user needs with business goals."
+  },
+  {
+    "question": "Which of these best describes a product’s lifecycle?",
+    "options": [
+      "Idea → Development → Launch → Growth → Maintenance.",
+      "Design → Development → Marketing → Retirement.",
+      "Research → Manufacturing → Distribution → Sales.",
+      "Plan → Build → Test → Deploy."
+    ],
+    "answer": 0,
+    "explanation": "A product’s lifecycle typically goes from idea to development, launch, growth, and ongoing maintenance."
+  },
+  {
+    "question": "Which activity is a PM most likely responsible for?",
+    "options": [
+      "Writing the product’s codebase.",
+      "Prioritizing features in the product roadmap.",
+      "Managing the company’s finances.",
+      "Designing company logos."
+    ],
+    "answer": 1,
+    "explanation": "PMs prioritize product features and manage the roadmap based on strategy and user impact."
+  },
+  {
+    "question": "Why are user interviews important?",
+    "options": [
+      "They confirm assumptions without needing data.",
+      "They help gather unbiased, factual information from users.",
+      "They allow selling the product to more customers.",
+      "They mostly test marketing messaging."
+    ],
+    "answer": 1,
+    "explanation": "\"User interviews are the foundation of any product design\". They gather facts about users’ needs."
+  },
+  {
+    "question": "What is a 'journey map' in product work?",
+    "options": [
+      "A financial projection for product revenue.",
+      "A timeline of a user’s steps and feelings to achieve a goal.",
+      "A map of the office where product team works.",
+      "A chart comparing different products."
+    ],
+    "answer": 1,
+    "explanation": "A journey map visualizes the steps a user goes through to accomplish a goal, highlighting pain points."
+  },
+  {
+    "question": "What does 'learning by doing' imply in this course?",
+    "options": [
+      "Reading textbooks instead of practicing.",
+      "Only watching videos and not applying knowledge.",
+      "Completing projects and reflecting to build real skills.",
+      "Skipping quizzes to save time."
+    ],
+    "answer": 2,
+    "explanation": "This course emphasizes hands-on projects and practice (building portfolio artifacts) to learn product management."
+  },
+  {
+    "question": "Which framework helps prioritize tasks by value and effort?",
+    "options": [
+      "Double Diamond",
+      "SMART Goals",
+      "Impact vs Effort Matrix",
+      "Empathy Map"
+    ],
+    "answer": 2,
+    "explanation": "The Impact vs Effort Matrix helps prioritize by comparing potential impact against the effort required."
+  },
+  {
+    "question": "In PM OS, what comes right after completing all lessons in a week?",
+    "options": [
+      "Starting the next week’s lessons immediately.",
+      "Taking the quiz for that week’s lessons.",
+      "Creating the portfolio case study for next week.",
+      "Taking a break until the next week."
+    ],
+    "answer": 1,
+    "explanation": "After lessons, you take a quiz to check your understanding before moving on to the assignment (as per the program flow)."
+  },
+  {
+    "question": "What is a key benefit of observations (field studies) in user research?",
+    "options": [
+      "They save time by skipping analysis.",
+      "They force users to adapt to the product.",
+      "They reveal real user behavior in context.",
+      "They only work for digital products."
+    ],
+    "answer": 2,
+    "explanation": "Observing users in their natural environment uncovers insights about actual behavior, not just opinions."
+  },
+  {
+    "question": "What should your LinkedIn post at the end of Foundation focus on?",
+    "options": [
+      "Advertising the PM OS product to friends.",
+      "Announcing you quit the program.",
+      "Sharing your learning journey and excitement in a concise narrative.",
+      "Posting unrelated memes to celebrate."
+    ],
+    "answer": 2,
+    "explanation": "You should craft a short story about starting the fellowship and invite engagement (a positive narrative)."
+  }
+]

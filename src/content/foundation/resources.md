@@ -1,5 +1,4 @@
 # Resources
-# Resources
 
 **Articles & Blogs:**
 - [The Nielsen Norman Group – Contextual Inquiry](https://www.nngroup.com/articles/contextual-inquiry/) – How observing users in context uncovers hidden insights.  
@@ -15,4 +14,3 @@
 **Videos & Podcasts:**
 - [Product School YouTube Channel](https://www.youtube.com/c/ProductSchool) – Short videos on PM topics and career tips.  
 - [The Product Podcast](https://podcasts.apple.com/us/podcast/the-product-podcast/id1639711946) – Interviews with top product leaders.
-

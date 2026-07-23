@@ -1,7 +1,13 @@
 {
-  "id": 0,
-  "folder": "foundation",
-  "title": "Foundation · Orientation",
+  "id": "foundation",
+  "title": "Foundation",
+  "subtitle": "Getting Started with Product Management",
   "difficulty": "Beginner",
-  "estimatedHours": "6"
+  "estimatedHours": 5,
+  "xp": 200,
+  "portfolio": "My Product Journey",
+  "lessons": 3,
+  "assignment": 1,
+  "quiz": 1,
+  "pmLab": 1
 }
