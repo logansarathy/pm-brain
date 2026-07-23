@@ -118,6 +118,11 @@ export function getWeekContent(weekId: number): WeekContent {
     estimatedHours: '6',
   };
 
+  const rawQuiz = getJson('quiz.json');
+  const quizData: QuizData = rawQuiz && Array.isArray(rawQuiz.questions)
+    ? rawQuiz
+    : { title: '', questions: [] };
+
   const lessonKeys = Object.keys(markdownFiles)
     .filter((path) => path.startsWith(`${basePath}/lesson-`))
     .sort();
@@ -157,7 +162,7 @@ export function getWeekContent(weekId: number): WeekContent {
     portfolio: getMd('portfolio.md'),
     linkedin: getMd('linkedin.md'),
     reflection: getMd('reflection.md'),
-    quiz,
+    quiz: quizData,
   };
 }
 

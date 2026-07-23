@@ -176,6 +176,7 @@ export const WeekView: React.FC<{ weekId: number }> = ({ weekId }) => {
   };
 
   const base = `weeks.${w.id}`;
+  const quizQuestions = loadedContent.quiz?.questions ?? [];
 
   const renderContentBlock = (blk: ContentBlock, lessonIdx: number, blockIdx: number) => {
     const typeInfo = BLOCK_TYPES.find((t) => t[0] === blk.type) || ['paragraph', 'Paragraph', '¶'];
