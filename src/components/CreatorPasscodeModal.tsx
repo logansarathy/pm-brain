@@ -7,7 +7,7 @@ interface CreatorPasscodeModalProps {
   onSuccess: () => void;
 }
 
-const SECRET_PASSCODE ="!@#$%^&*()_+";
+const SECRET_PASSCODE = '!@#$%^&*()_+';
 
 export const CreatorPasscodeModal: React.FC<CreatorPasscodeModalProps> = ({
   isOpen,
@@ -22,7 +22,7 @@ export const CreatorPasscodeModal: React.FC<CreatorPasscodeModalProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (passcode.trim() === SECRET_PASSCODE || passcode.trim() === 'creator123') {
+    if (passcode.trim() === SECRET_PASSCODE) {
       setError(false);
       onSuccess();
       showToast('Creator Mode Unlocked ✏️');
