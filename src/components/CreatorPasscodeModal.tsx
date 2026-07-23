@@ -7,7 +7,7 @@ interface CreatorPasscodeModalProps {
   onSuccess: () => void;
 }
 
-const SECRET_PASSCODE = '!@#$%^&*()_+';
+const SECRET_PASSCODE = import.meta.env.VITE_CREATOR_SECRET;
 
 export const CreatorPasscodeModal: React.FC<CreatorPasscodeModalProps> = ({
   isOpen,
