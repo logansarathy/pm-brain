@@ -37,6 +37,7 @@ export const BLOCK_TYPES: Array<[string, string, string]> = [
   ['checklist', 'Checklist', '☑'],
   ['exercise', 'Exercise', '✏️'],
   ['quiz', 'Quiz', '❓'],
+  ['resource', 'Resource', '🔗'],
   ['divider', 'Divider', '—'],
   ['callout', 'Callout', '💡'],
 ];
@@ -49,13 +50,13 @@ export function newBlock(type: string): ContentBlock {
     case 'paragraph':
       return { id, type, text: '' };
     case 'video':
-      return { id, type, title: '', url: '' };
+      return { id, type, title: '', url: '', description: '', caption: '' };
     case 'article':
-      return { id, type, title: '', url: '' };
+      return { id, type, title: '', url: '', author: '', description: '' };
     case 'book':
       return { id, type, title: '', author: '', url: '' };
     case 'framework':
-      return { id, type, title: '', description: '' };
+      return { id, type, title: '', description: '', caption: '' };
     case 'image':
       return { id, type, url: '', caption: '' };
     case 'quote':
@@ -66,6 +67,8 @@ export function newBlock(type: string): ContentBlock {
       return { id, type, prompt: '', studentAnswer: '' };
     case 'quiz':
       return { id, type, questions: [], score: null };
+    case 'resource':
+      return { id, type, text: '', url: '' };
     case 'divider':
       return { id, type };
     case 'callout':
@@ -81,14 +84,36 @@ export function defaultLessons(): Lesson[] {
     title: `Lesson ${n}`,
     objective: '',
     estimatedTime: '',
-    contentBlocks: [newBlock('paragraph'), newBlock('quiz')],
+    content: '',
+    videos: [],
+    articles: [],
+    books: [],
+    frameworks: [],
+    images: [],
+    quotes: [],
+    checklists: [],
+    exercises: [],
+    quiz: [],
+    resources: [],
     notes: '',
     keyTakeaways: '',
     completion: { done: false },
+    contentBlocks: [newBlock('paragraph'), newBlock('quiz')],
   }));
 }
 
 export function ensureLessonShape(lsn: Partial<Lesson>): Lesson {
+  if (typeof lsn.content !== 'string') lsn.content = '';
+  if (!lsn.videos) lsn.videos = [];
+  if (!lsn.articles) lsn.articles = [];
+  if (!lsn.books) lsn.books = [];
+  if (!lsn.frameworks) lsn.frameworks = [];
+  if (!lsn.images) lsn.images = [];
+  if (!lsn.quotes) lsn.quotes = [];
+  if (!lsn.checklists) lsn.checklists = [];
+  if (!lsn.exercises) lsn.exercises = [];
+  if (!lsn.quiz) lsn.quiz = [];
+  if (!lsn.resources) lsn.resources = [];
   if (!lsn.contentBlocks) lsn.contentBlocks = [];
   if (typeof lsn.objective !== 'string') lsn.objective = '';
   if (typeof lsn.estimatedTime !== 'string') lsn.estimatedTime = '';

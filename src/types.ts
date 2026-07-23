@@ -1,5 +1,96 @@
 export type Mode = 'study' | 'creator';
 
+export interface ResourceItem {
+  id?: string;
+  text: string;
+  url?: string;
+  done?: boolean;
+}
+
+export interface LessonContent {
+  title?: string;
+  content?: string;
+  videos?: VideoItem[];
+  articles?: ArticleItem[];
+  books?: BookItem[];
+  frameworks?: FrameworkItem[];
+  images?: ImageItem[];
+  quotes?: QuoteItem[];
+  checklists?: ChecklistItem[];
+  exercises?: ExerciseItem[];
+  quiz?: QuizQuestion[];
+  resources?: ResourceItem[];
+}
+
+export interface VideoItem {
+  id: string;
+  title: string;
+  url: string;
+  duration?: string;
+  description?: string;
+  thumbnail?: string;
+}
+
+export interface ArticleItem {
+  id: string;
+  title: string;
+  url: string;
+  author?: string;
+  readingTime?: string;
+  description?: string;
+}
+
+export interface BookItem {
+  id: string;
+  bookName: string;
+  author?: string;
+  chapter?: string;
+  pages?: string;
+  url?: string;
+}
+
+export interface FrameworkItem {
+  id: string;
+  title: string;
+  description?: string;
+  image?: string;
+}
+
+export interface ImageItem {
+  id: string;
+  title: string;
+  path?: string;
+  url?: string;
+  caption?: string;
+}
+
+export interface QuoteItem {
+  id: string;
+  text: string;
+  author?: string;
+}
+
+export interface ChecklistItem {
+  id: string;
+  title: string;
+  items: Array<{ id: string; text: string; done: boolean }>;
+}
+
+export interface ExerciseItem {
+  id: string;
+  title: string;
+  description?: string;
+  difficulty?: string;
+}
+
+export interface QuizQuestion {
+  id: string;
+  question: string;
+  options: string[];
+  correctAnswer: number;
+  explanation?: string;
+}
+
 export interface ContentBlock {
   id: string;
   type: string;
@@ -22,16 +113,21 @@ export interface Lesson {
   title: string;
   objective: string;
   estimatedTime: string;
-  contentBlocks: ContentBlock[];
+  content: string;
+  videos: VideoItem[];
+  articles: ArticleItem[];
+  books: BookItem[];
+  frameworks: FrameworkItem[];
+  images: ImageItem[];
+  quotes: QuoteItem[];
+  checklists: ChecklistItem[];
+  exercises: ExerciseItem[];
+  quiz: QuizQuestion[];
+  resources: ResourceItem[];
   notes: string;
   keyTakeaways: string;
   completion: { done: boolean };
-}
-
-export interface ResourceItem {
-  text: string;
-  url?: string;
-  done: boolean;
+  contentBlocks?: ContentBlock[];
 }
 
 export interface Week {

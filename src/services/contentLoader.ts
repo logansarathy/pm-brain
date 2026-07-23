@@ -16,6 +16,8 @@
  * - When changing UI layout or styling (edit components in `src/components/` or `src/views/` instead).
  */
 
+import { LessonContent } from '../types';
+
 export interface QuizQuestion {
   id: string;
   text: string;
@@ -33,6 +35,7 @@ export interface LoadedLesson {
   filename: string;
   title: string;
   markdown: string;
+  lessonContent?: LessonContent;
 }
 
 export interface WeekContent {
@@ -115,7 +118,6 @@ export function getWeekContent(weekId: number): WeekContent {
     estimatedHours: '6',
   };
 
-  // Find all lesson markdown files for this week
   const lessonKeys = Object.keys(markdownFiles)
     .filter((path) => path.startsWith(`${basePath}/lesson-`))
     .sort();
@@ -123,24 +125,21 @@ export function getWeekContent(weekId: number): WeekContent {
   const lessons: LoadedLesson[] = lessonKeys.map((key, index) => {
     const filename = key.split('/').pop() || `lesson-${String(index + 1).padStart(2, '0')}.md`;
     const markdown = markdownFiles[key] || '';
-    
-    // Extract first h1 title if present
+    const jsonFilename = filename.replace(/\.md$/, '.json');
+    const rawLessonContent = getJson(jsonFilename);
+    const lessonContent = rawLessonContent && Object.keys(rawLessonContent).length ? (rawLessonContent as LessonContent) : undefined;
+
     const firstLine = markdown.split('\n').find((l) => l.startsWith('# '));
-    const title = firstLine ? firstLine.replace(/^#\s+/, '').trim() : `Lesson ${index + 1}`;
+    const title = lessonContent?.title || (firstLine ? firstLine.replace(/^#\s+/, '').trim() : `Lesson ${index + 1}`);
 
     return {
       id: `content_lsn_${weekId}_${index + 1}`,
       filename,
       title,
       markdown,
+      lessonContent,
     };
   });
-
-  const quizRaw = getJson('quiz.json');
-  const quiz: QuizData = {
-    title: quizRaw.title || `Week ${weekId} Checkpoint Quiz`,
-    questions: Array.isArray(quizRaw.questions) ? quizRaw.questions : [],
-  };
 
   return {
     weekId,

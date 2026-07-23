@@ -31,6 +31,16 @@ import {
 } from '../components/Icons';
 import { getWeekContent, WeekContent } from '../services/contentLoader';
 import { MarkdownView } from '../components/MarkdownView';
+import { VideoSection } from '../components/lesson/VideoSection';
+import { ArticleSection } from '../components/lesson/ArticleSection';
+import { BookSection } from '../components/lesson/BookSection';
+import { FrameworkSection } from '../components/lesson/FrameworkSection';
+import { ImageSection } from '../components/lesson/ImageSection';
+import { QuoteSection } from '../components/lesson/QuoteSection';
+import { ChecklistSection } from '../components/lesson/ChecklistSection';
+import { ExerciseSection } from '../components/lesson/ExerciseSection';
+import { QuizSection } from '../components/lesson/QuizSection';
+import { ResourcesSection } from '../components/lesson/ResourcesSection';
 
 const WEEK_TABS: Array<[string, string]> = [
   ['overview', 'Overview'],
@@ -314,18 +324,28 @@ export const WeekView: React.FC<{ weekId: number }> = ({ weekId }) => {
   };
 
   const renderLessons = () => {
-    // Combine state lessons with static markdown content lessons
     const contentLessons = loadedContent.lessons;
     const lessons = w.lessons && w.lessons.length ? w.lessons : contentLessons.map((cl, i) => ({
       id: cl.id,
       title: cl.title,
       objective: '',
       estimatedTime: '20 min',
-      contentBlocks: [],
+      content: cl.markdown,
+      videos: [],
+      articles: [],
+      books: [],
+      frameworks: [],
+      images: [],
+      quotes: [],
+      checklists: [],
+      exercises: [],
+      quiz: [],
+      resources: [],
       notes: '',
       keyTakeaways: '',
       completion: { done: false },
-    }));
+      contentBlocks: [],
+    } as any));
 
     return (
       <>
@@ -395,6 +415,18 @@ export const WeekView: React.FC<{ weekId: number }> = ({ weekId }) => {
                   <MarkdownView content={staticMd} />
                 </div>
               )}
+
+              {/* Structured Lesson Content Sections */}
+              <VideoSection videos={lsnShape.videos} />
+              <ArticleSection articles={lsnShape.articles} />
+              <BookSection books={lsnShape.books} />
+              <FrameworkSection frameworks={lsnShape.frameworks} />
+              <ImageSection images={lsnShape.images} />
+              <QuoteSection quotes={lsnShape.quotes} />
+              <ChecklistSection checklists={lsnShape.checklists} />
+              <ExerciseSection exercises={lsnShape.exercises} />
+              <QuizSection quiz={lsnShape.quiz} />
+              <ResourcesSection resources={lsnShape.resources} />
 
               <div className="content-blocks">
                 {(lsnShape.contentBlocks || []).map((blk, blockIdx) =>
