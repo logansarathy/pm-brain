@@ -140,7 +140,7 @@ export const Sidebar: React.FC = () => {
         </button>
       </div>
 
-      <nav className="sidebar-nav">
+      <nav className="sidebar-scroll sidebar-nav">
         {navGroups.map((g, idx) => (
           <div className="nav-group" key={idx}>
             {g.group && !collapsed && <div className="nav-group-title">{g.group}</div>}
